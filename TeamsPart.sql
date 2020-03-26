@@ -1,8 +1,9 @@
 
 USE FootbalTeams
-DROP TABLE IF EXISTS RankingTeams, Standings, TeamsMatches
-DROP TABLE IF EXISTS ParametresTeams, TeamAttributes,Parametres, TeamsLeagues,  Teams,   RankingSystems
-DROP TABLE IF EXISTS Genders, GroupsAge, TeamTypes
+
+DROP TABLE IF EXISTS RankingTeams,  Standings
+DROP TABLE IF EXISTS ParametresTeams,  TeamAttributes,Parametres,TeamsMatches,  Matches,  RankingSystems
+DROP TABLE IF EXISTS  Teams, Genders, GroupsAge, TeamTypes
 
 CREATE TABLE Genders (
 	ID INT NOT NULL 
@@ -60,13 +61,13 @@ CREATE TABLE ParametresTeams(
 )
 
 
-CREATE TABLE TeamsLeagues (
+CREATE TABLE Matches (
 	ID INT NOT NULL
-		CONSTRAINT PK_TeamsLeagues PRIMARY KEY CLUSTERED,
-	TeamID INT NOT NULL
-		CONSTRAINT FK_Teams_Leagues FOREIGN KEY REFERENCES Teams(ID),
-	LeagueID INT NOT NULL, --FOREIGN
-
+		CONSTRAINT PK_TeamsMatches PRIMARY KEY CLUSTERED,
+	VisitorTeamID INT NOT NULL
+		CONSTRAINT FK_VisitorTeams_Teams FOREIGN KEY REFERENCES Teams(ID),
+	HomeTeamID INT NOT NULL
+		CONSTRAINT FK_HomeTeams_Teams FOREIGN KEY REFERENCES Teams(ID)
 )
 
 CREATE TABLE RankingSystems (
@@ -86,7 +87,8 @@ CREATE TABLE RankingTeams (
 	RatingSystemId INT NULL
 		CONSTRAINT FK_RankingTeams_RankingSystem FOREIGN KEY REFERENCES RankingSystems(ID),
 	TotalPoint FLOAT NULL,
-	PreviousPoints FLOAT NULL,
+	PreviousSeasonRankingId INT NULL
+		CONSTRAINT FK_RankingTeams_RankingTeams FOREIGN KEY REFERENCES RankingTeams(ID),
 	RankChange SMALLINT NULL,
 )
 
