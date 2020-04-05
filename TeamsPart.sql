@@ -1,6 +1,8 @@
 
 USE FootbalTeams
-DROP TABLE IF EXISTS TeamsLeaguesStatistics,TeamsStatisticsTypes, TimePeriods
+DROP TABLE IF EXISTS RankingTeamsParametrsValues,RankingTeamsParametrs
+DROP TABLE IF EXISTS TeamLeagueStatisticsParametrValues, TeamLeagueParametrs
+DROP TABLE IF EXISTS TeamLeagueStatistics, TimePeriods
 DROP TABLE IF EXISTS RankingTeams, Standings
 DROP TABLE IF EXISTS  TeamsMatches,  Matches,  RankingSystems
 DROP TABLE IF EXISTS Teams, TeamGenders, AgeCategories, TeamTypes
@@ -8,19 +10,39 @@ CREATE TABLE TimePeriods (
 	ID INT NOT NULL 
 		CONSTRAINT PK_TimePeriods PRIMARY KEY CLUSTERED,
 )
-CREATE TABLE TeamsStatisticsTypes (
+
+
+CREATE TABLE AgeCategories (
 	ID INT NOT NULL
-		CONSTRAINT PK_TeamsStatisticsTypes PRIMARY KEY CLUSTERED,
-	TeamsStatisticsTypes VARCHAR(255)
+		CONSTRAINT PK_AgeCategories PRIMARY KEY CLUSTERED,
+	Name VARCHAR(255) NOT NULL
 )
-CREATE TABLE TeamsLeaguesStatistics (
+CREATE TABLE TeamTypes (
+	ID INT NOT NULL
+		CONSTRAINT PK_TeamType PRIMARY KEY CLUSTERED,
+	Name VARCHAR(255) NOT NULL
+)
+CREATE TABLE Teams (
+	ID INT NOT NULL
+		CONSTRAINT PK_Teams PRIMARY KEY CLUSTERED,
+	TeamGender BIT,
+	AgeCategoryId INT NOT NULL
+		CONSTRAINT FK_Teams_AgeCategories FOREIGN KEY REFERENCES AgeCategories(ID),
+	TeamTypeId INT NOT NULL
+		CONSTRAINT FK_Teams_TeamTypes FOREIGN KEY REFERENCES TeamTypes(ID),   
+	Name VARCHAR(1000) NOT NULL,
+	CountryId INT NOT NULL,
+	EstablishmentDate DATE NOT NULL	
+)
+CREATE TABLE TeamLeagueStatistics (
 	ID INT NOT NULL 
-		CONSTRAINT PK_TeamsSeasonStatistics PRIMARY KEY CLUSTERED,
+		CONSTRAINT PK_TeamLeagueStatistics PRIMARY KEY CLUSTERED,
 	LeagueID INT NOT NULL,--DEPENDS ON th implementationn
+	TeamID INT NOT NULL
+		CONSTRAINT FK_TeamsLeaguesStatistics_Teams FOREIGN KEY REFERENCES Teams(ID),
 	TimePeriodId INT NULL
 		CONSTRAINT FK_TeamsLeaguesStatistics_TimePeriods FOREIGN KEY REFERENCES TimePeriods(ID),
-	TeamsStatisticsTypesId INT NULL
-		CONSTRAINT FK_TeamsLeaguesStatistics_TeamsStatisticsTypesId FOREIGN KEY REFERENCES TeamsStatisticsTypes(ID),
+	PlaceOfPlay BIT NULL,
 	PossessionPercentage FLOAT NULL,
 	PassPercentage FLOAT NULL,
 	Wins SMALLINT NULL,
@@ -46,34 +68,26 @@ CREATE TABLE TeamsLeaguesStatistics (
 	DribblesPerGame FLOAT NULL,
 	FouledPerGame FLOAT NULL,
 
-
-
+	
 )
-CREATE TABLE AgeCategories (
+CREATE TABLE TeamLeagueStatisticsParametrs
+(
 	ID INT NOT NULL
-		CONSTRAINT PK_AgeCategories PRIMARY KEY CLUSTERED,
+		CONSTRAINT PK_TeamLeagueStatisticsParametrs PRIMARY KEY CLUSTERED,
 	Name VARCHAR(255) NOT NULL
 )
-CREATE TABLE TeamTypes (
+
+CREATE TABLE TeamLeagueStatisticsParametrValues
+(
 	ID INT NOT NULL
-		CONSTRAINT PK_TeamType PRIMARY KEY CLUSTERED,
-	Name VARCHAR(255) NOT NULL
+		CONSTRAINT PK_TeamLeagueStatisticsParametrValues PRIMARY KEY CLUSTERED,
+	ParametrValue FLOAT NOT NULL,
+	TeamsLeaguesParametrsId INT 
+		CONSTRAINT FK_TeamsLeaguesStatisticsParametrsValues_TeamsLeaguesParametrs FOREIGN KEY REFERENCES TeamLeagueStatisticsParametrs(ID),
+	TeamLeagueStatisticsId INT 
+		CONSTRAINT FK_TeamsLeaguesStatisticsParametrsValues_TTeamLeagueStatisticsId FOREIGN KEY REFERENCES TeamLeagueStatistics(ID)
+
 )
-CREATE TABLE Teams (
-	ID INT NOT NULL
-		CONSTRAINT PK_Teams PRIMARY KEY CLUSTERED,
-	TeamGender BIT,
-	AgeCategoryId INT NOT NULL
-		CONSTRAINT FK_Teams_AgeCategories FOREIGN KEY REFERENCES AgeCategories(ID),
-	TeamTypeId INT NOT NULL
-		CONSTRAINT FK_Teams_TeamTypes FOREIGN KEY REFERENCES TeamTypes(ID),   
-	Name VARCHAR(1000) NOT NULL,
-	CountryId INT NOT NULL,
-	EstablishmentDate DATE NOT NULL	
-)
-
-
-
 
 CREATE TABLE Matches (
 	ID INT NOT NULL
@@ -89,11 +103,12 @@ CREATE TABLE RankingSystems (
 		CONSTRAINT PK_RankingSystem PRIMARY KEY CLUSTERED,
 	Name VARCHAR(255) NOT NULL
 )
+	
 
 CREATE TABLE RankingTeams (
 	ID INT NOT NULL
 		CONSTRAINT PK_RankingTeams PRIMARY KEY CLUSTERED,
-	SeasonID INT NULL, --FOREIGN KEY
+	SeasonID INT NULL,
 	TeamID INT NOT NULL
 		CONSTRAINT FK_RankingTeams_Teams FOREIGN KEY REFERENCES Teams(ID),
 	TeamRank INT NOT NULL,
@@ -113,6 +128,21 @@ CREATE TABLE RankingTeams (
 	LastYearAgoWeighted FLOAT NULL,
 	CurrentYearAgoAverage FLOAT NULL,
 	CurrentYearAgoWeighted FLOAT NULL
+)
+CREATE TABLE RankingTeamsParametrs (
+	ID INT NOT NULL 
+		CONSTRAINT PK_RankingTeamsParametrs PRIMARY KEY CLUSTERED,
+	Name VARCHAR(255) NOT NULL
+)
+
+CREATE TABLE RankingTeamsParametrsValues (
+	ID INT NOT NULL
+		CONSTRAINT PK_RankingTeamsParametrsValues PRIMARY KEY CLUSTERED,
+	ParametrValue FLOAT,
+	RankingTeamsParametrsId INT NOT NULL
+		CONSTRAINT FK_RankingTeamsParametrsValues_RankingTeamsParametrs FOREIGN KEY REFERENCES RankingTeamsParametrs(ID),
+	RankingTeamsId INT NOT NULL
+		CONSTRAINT FK_RankingTeamsParametrsValues_RankingTeams FOREIGN KEY REFERENCES RankingTeams(ID)
 )
 
 CREATE TABLE Standings ( 
