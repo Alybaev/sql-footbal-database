@@ -17,59 +17,158 @@ CREATE DATABASE FootbalTeams
 GO
 USE FootbalTeams
 
-CREATE TABLE EventNames (                        
+CREATE TABLE EventNames (
     ID INT PRIMARY KEY IDENTITY (1, 1),
     Name VARCHAR (50) NOT NULL
 );
 GO
 
-CREATE TABLE Players (                         
-    ID INT PRIMARY KEY IDENTITY (1, 1),
-    FirstName NVARCHAR (50) NOT NULL,
-    LastName NVARCHAR (50) NOT NULL,
-    DateOfBirth DATE NOT NULL,
-    Height FLOAT NOT NULL,
-    IsRightLeg BIT NOT NULL
-);
- GO 
-
-
-
-
-
-
-
-CREATE TABLE Positions (                        
-    ID INT PRIMARY KEY IDENTITY (1, 1),
-    Name VARCHAR (50) NOT NULL
-);
+CREATE TABLE Nationality
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    name VARCHAR(50)
+)
 GO
-
-
-
-
-
-CREATE TABLE StatisticIndicators (                        
-    ID INT PRIMARY KEY IDENTITY (1, 1),
-    Name VARCHAR (50) NOT NULL
-);
-GO
-
-CREATE TABLE IndicatorAttributes (                        
-    ID INT PRIMARY KEY IDENTITY (1, 1),
-    Name VARCHAR (50) NOT NULL
-);
-GO
-
-
-
-
 
 CREATE TABLE Countries (
     Id INT NOT NULL
         CONSTRAINT PK_Country PRIMARY KEY CLUSTERED,
     [Name] NVARCHAR(100) NOT NULL
 );
+GO
+
+CREATE TABLE Cities (
+    ID INT PRIMARY KEY IDENTITY (1, 1),
+    Name VARCHAR (50) NOT NULL,
+    CountryID INT NOT NULL
+		CONSTRAINT FK_Cities_Countries FOREIGN KEY REFERENCES Countries(ID)
+);
+GO
+
+CREATE TABLE Religion
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    name VARCHAR(50)
+)
+
+CREATE TABLE Players (
+    ID INT PRIMARY KEY IDENTITY (1, 1),
+    FirstName NVARCHAR (50) NOT NULL,
+    LastName NVARCHAR (50) NOT NULL,
+    DateOfBirth DATE NOT NULL,
+    Gender BIT,
+	  NationalityId INT NOT NULL
+      FOREIGN KEY (nationalityId) REFERENCES Nationality(Id),
+    MaritalStatus BIT,
+    HomeCity INT NOT NULL
+      FOREIGN KEY (homeCity) REFERENCES Cities(Id),
+	ReligionID INT NOT NULL
+	   FOREIGN KEY (ReligionID) REFERENCES Religion(Id),
+);
+ GO
+
+ CREATE TABLE EducationType
+ (
+     id INT NOT NULL IDENTITY PRIMARY KEY,
+     name VARCHAR(50)
+ )
+ GO
+CREATE TABLE Education
+ (
+     id INT NOT NULL IDENTITY PRIMARY KEY,
+     name VARCHAR(100),
+     typeId INT NOT NULL,
+     startDate DATE NOT NULL,
+     endDate DATE NOT NULL,
+     playerId INT NOT NULL,
+     FOREIGN KEY (playerId) REFERENCES Players(Id),
+ 	   FOREIGN KEY (typeId) REFERENCES EducationType(Id)
+ )
+GO
+
+CREATE TABLE MentalStatus
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    playerId INT NOT NULL,
+    measureDate DATE NOT NULL,
+    aggression INT NOT NULL,
+    anticipation INT NOT NULL,
+    bravery INT NOT NULL,
+    composure INT NOT NULL,
+    concentration INT NOT NULL,
+    decision INT NOT NULL,
+    determination INT NOT NULL,
+    flair INT NOT NULL,
+    leadership INT NOT NULL,
+    offTheBall INT NOT NULL,
+    positioning INT NOT NULL,
+    teamwork INT NOT NULL,
+    vision INT NOT NULL,
+    workRate INT NOT NULL,
+    FOREIGN KEY (playerId) REFERENCES Players(Id)
+)
+
+
+CREATE TABLE PhysicalStatus
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    playerId INT NOT NULL,
+    measureDate DATE NOT NULL,
+    bmi FLOAT NOT NULL,
+    height FLOAT NOT NULL,
+    weight DECIMAL NOT NULL,
+    acceleration INT NOT NULL,
+    agility INT NOT NULL,
+    balance INT NOT NULL,
+    jumpingReach INT NOT NULL,
+    naturalFitness INT NOT NULL,
+    pace INT NOT NULL,
+    stamine INT NOT NULL,
+    strength INT NOT NULL,
+    FOREIGN KEY (playerId) REFERENCES Players(Id)
+)
+
+CREATE TABLE TechnicalStatus
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    playerId INT NOT NULL,
+    measureDate DATE NOT NULL,
+    corner INT NOT NULL,
+    crossing INT NOT NULL,
+    dribbling INT NOT NULL,
+    finishing INT NOT NULL,
+    firstTouch INT NOT NULL,
+    freeKickTaking INT NOT NULL,
+    heading INT NOT NULL,
+    longShots INT NOT NULL,
+    longThrows INT NOT NULL,
+    marking INT NOT NULL,
+    passing INT NOT NULL,
+    penaltyTaking INT NOT NULL,
+    tacking INT NOT NULL,
+    technique INT NOT NULL,
+    FOREIGN KEY (playerId) REFERENCES Players(Id)
+)
+
+CREATE TABLE Positions (
+    ID INT PRIMARY KEY IDENTITY (1, 1),
+    Name VARCHAR (50) NOT NULL
+);
+GO
+
+
+CREATE TABLE StatisticIndicators (
+    ID INT PRIMARY KEY IDENTITY (1, 1),
+    Name VARCHAR (50) NOT NULL
+);
+GO
+
+CREATE TABLE IndicatorAttributes (
+    ID INT PRIMARY KEY IDENTITY (1, 1),
+    Name VARCHAR (50) NOT NULL
+);
+GO
+
 
 CREATE TABLE SoccerEvents (
     ID INT PRIMARY KEY IDENTITY (1, 1),
@@ -81,15 +180,9 @@ CREATE TABLE SoccerEvents (
 		CONSTRAINT FK_SoccerEvents_Countries FOREIGN KEY REFERENCES Countries(ID)
 );
 GO
-CREATE TABLE Cities (
-    ID INT PRIMARY KEY IDENTITY (1, 1),
-    Name VARCHAR (50) NOT NULL,
-    CountryID INT NOT NULL
-		CONSTRAINT FK_Cities_Countries FOREIGN KEY REFERENCES Countries(ID)
-);
-GO
+
 CREATE TABLE TimePeriods (
-	ID INT NOT NULL 
+	ID INT NOT NULL
 		CONSTRAINT PK_TimePeriods PRIMARY KEY CLUSTERED,
 )
 
@@ -113,16 +206,16 @@ CREATE TABLE Teams (
 	AgeCategoryId INT NOT NULL
 		CONSTRAINT FK_Teams_AgeCategories FOREIGN KEY REFERENCES AgeCategories(ID),
 	TeamTypeId INT NOT NULL
-		CONSTRAINT FK_Teams_TeamTypes FOREIGN KEY REFERENCES TeamTypes(ID),   
+		CONSTRAINT FK_Teams_TeamTypes FOREIGN KEY REFERENCES TeamTypes(ID),
 	Name VARCHAR(1000) NOT NULL,
 	CountryId INT NOT NULL
 		CONSTRAINT FK_Teams_Countries FOREIGN KEY REFERENCES Countries(ID),
-	EstablishmentDate DATE NOT NULL	
+	EstablishmentDate DATE NOT NULL
 )
 CREATE TABLE ClubPresidents (
     ID INT PRIMARY KEY IDENTITY (1, 1),
     Name VARCHAR (50) NOT NULL,
-    ClubID INT NOT NULL 
+    ClubID INT NOT NULL
 		CONSTRAINT FK_ClubPresidents_Clubs FOREIGN KEY REFERENCES Teams(ID),
     DateFrom DATE NOT NULL,
     DateTo DATE NULL
@@ -132,7 +225,7 @@ GO
 CREATE TABLE ClubCoaches (
     ID INT PRIMARY KEY IDENTITY (1, 1),
     Name VARCHAR (50) NOT NULL,
-    ClubID INT NOT NULL 
+    ClubID INT NOT NULL
 		CONSTRAINT FK_ClubCoaches_Clubs FOREIGN KEY REFERENCES Teams(ID),
     DateFrom DATE NOT NULL,
     DateTo DATE NULL
@@ -180,7 +273,7 @@ CREATE TABLE RankingTeams (
 	CurrentYearAgoWeighted FLOAT NULL
 )
 CREATE TABLE RankingTeamsParametrs (
-	ID INT NOT NULL 
+	ID INT NOT NULL
 		CONSTRAINT PK_RankingTeamsParametrs PRIMARY KEY CLUSTERED,
 	Name VARCHAR(255) NOT NULL
 )
@@ -195,7 +288,7 @@ CREATE TABLE RankingTeamsParametrsValues (
 		CONSTRAINT FK_RankingTeamsParametrsValues_RankingTeams FOREIGN KEY REFERENCES RankingTeams(ID)
 )
 GO
-CREATE TABLE TeamTactics 
+CREATE TABLE TeamTactics
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_TeamTactics PRIMARY KEY CLUSTERED,
@@ -209,19 +302,19 @@ CREATE TABLE TeamComposition
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_TeamComposition PRIMARY KEY CLUSTERED,
-	TacticID INT 
+	TacticID INT
 		CONSTRAINT FK_TeamComposition_TeamTactics FOREIGN KEY REFERENCES TeamTactics(ID),
 	MatchID INT,
-		
+
 	TeamID INT
 		CONSTRAINT FK_TeamComposition_Teams FOREIGN KEY REFERENCES Teams(ID)		--Teams table to be merged
 	--CoachID INT
 	--	CONSTRAINT FK_TeamComposition_Coaches FOREIGN KEY REFERENCES Coaches(ID)	Coaches table  to be merged
 )
 GO
-CREATE TABLE MatchStatuses 
+CREATE TABLE MatchStatuses
 (
-	ID INT NOT NULL IDENTITY (1,1) 
+	ID INT NOT NULL IDENTITY (1,1)
 		CONSTRAINT PK_MatchStatuses PRIMARY KEY CLUSTERED,
 	Name NVARCHAR(50)
 )
@@ -251,14 +344,14 @@ CREATE TABLE MatchTeams (
     ClubID INT NOT NULL
 		CONSTRAINT FK_MatchTeams_Clubs FOREIGN KEY REFERENCES Teams(ID),
     PlayerID INT NOT NULL
-		CONSTRAINT FK_MatchTeams_Players FOREIGN KEY REFERENCES Players(ID), 
+		CONSTRAINT FK_MatchTeams_Players FOREIGN KEY REFERENCES Players(ID),
     PositionID INT NOT NULL
 		CONSTRAINT FK_MatchTeams_Positions FOREIGN KEY REFERENCES Positions(ID),
 );
  GO
---- Общее ---
+--- пїЅпїЅпїЅпїЅпїЅ ---
 CREATE TABLE Seasons (
-    Id INT NOT NULL 
+    Id INT NOT NULL
         CONSTRAINT PK_Season PRIMARY KEY CLUSTERED,
     Season INT NOT NULL,
     [Date] DATE NOT NULL
@@ -281,7 +374,7 @@ CREATE TABLE Leagues (
     [Name] NVARCHAR(50) NOT NULL
 );
 CREATE TABLE TeamLeagueStatistics (
-	ID INT NOT NULL 
+	ID INT NOT NULL
 		CONSTRAINT PK_TeamLeagueStatistics PRIMARY KEY CLUSTERED,
 	LeagueID INT NOT NULL
 		CONSTRAINT FK_TeamsLeaguesStatistics_Leagues FOREIGN KEY REFERENCES Leagues(ID),
@@ -320,27 +413,27 @@ CREATE TABLE TeamLeagueStatisticsParametrValues
 	ID INT NOT NULL
 		CONSTRAINT PK_TeamLeagueStatisticsParametrValues PRIMARY KEY CLUSTERED,
 	ParametrValue FLOAT NOT NULL,
-	TeamsLeaguesParametrsId INT 
+	TeamsLeaguesParametrsId INT
 		CONSTRAINT FK_TeamsLeaguesStatisticsParametrsValues_TeamsLeaguesParametrs FOREIGN KEY REFERENCES TeamLeagueStatisticsParametrs(ID),
-	TeamLeagueStatisticsId INT 
+	TeamLeagueStatisticsId INT
 		CONSTRAINT FK_TeamsLeaguesStatisticsParametrsValues_TTeamLeagueStatisticsId FOREIGN KEY REFERENCES TeamLeagueStatistics(ID)
 )
 
-CREATE TABLE Standings ( 
-	ID INT NOT NULL   CONSTRAINT PK_Standings PRIMARY KEY CLUSTERED, 
+CREATE TABLE Standings (
+	ID INT NOT NULL   CONSTRAINT PK_Standings PRIMARY KEY CLUSTERED,
 	LeagueId INT NOT NULL
-		CONSTRAINT FK_Standings_Leagues FOREIGN KEY REFERENCES Leagues(ID), 
-	TourNumber INT NOT NULL, 
-	TeamId INT NOT NULL CONSTRAINT FK_Standings_Teams FOREIGN KEY REFERENCES Teams(Id), 
-	Place SMALLINT NOT NULL, 
+		CONSTRAINT FK_Standings_Leagues FOREIGN KEY REFERENCES Leagues(ID),
+	TourNumber INT NOT NULL,
+	TeamId INT NOT NULL CONSTRAINT FK_Standings_Teams FOREIGN KEY REFERENCES Teams(Id),
+	Place SMALLINT NOT NULL,
 	Points FLOAT NULL,
 	Win INT NULL,
-	Loss INT NULL, 
+	Loss INT NULL,
 	Draw INT NULL,
-	GoalsScored INT NULL, 
+	GoalsScored INT NULL,
 	GoalsMissed INT NULL,
-	GoalsDiff INT NULL, 
-	WinRate FLOAT NULL 
+	GoalsDiff INT NULL,
+	WinRate FLOAT NULL
 )
 CREATE TABLE Divisions (
     Id INT NOT NULL
@@ -367,7 +460,7 @@ CREATE TABLE TeamInLeagues (
         CONSTRAINT FK_TeamInLeague_Team FOREIGN KEY REFERENCES Teams(Id)
 );
 GO
-CREATE TABLE PlayerStatistics (                        
+CREATE TABLE PlayerStatistics (
     ID INT PRIMARY KEY IDENTITY (1, 1),
     PlayerID INT NOT NULL
 		CONSTRAINT FK_PlayerStatistics_Players FOREIGN KEY REFERENCES Players(ID),
@@ -415,7 +508,7 @@ CREATE TABLE Deals (
 
 CREATE TABLE Loans (
     Id INT NOT NULL
-        CONSTRAINT PK_Loan PRIMARY KEY CLUSTERED, 
+        CONSTRAINT PK_Loan PRIMARY KEY CLUSTERED,
     DealId INT NOT NULL
         CONSTRAINT FK_Loan_Deal FOREIGN KEY REFERENCES Deals(Id),
     EndDate DATE NOT NULL
@@ -519,7 +612,7 @@ CREATE TABLE CoachStatistics (
   [TotalPoint] INTEGER NULL DEFAULT NULL,
   PRIMARY KEY ([ID])
 );
-		
+
 CREATE TABLE Stadiums (
   [ID] INTEGER NOT NULL IDENTITY,
   [OpeningDate] DATE NULL DEFAULT NULL,
@@ -528,7 +621,7 @@ CREATE TABLE Stadiums (
   PRIMARY KEY ([ID])
 );
 
-		
+
 CREATE TABLE HomeTeams (
   [ID] INTEGER NOT NULL IDENTITY,
   [StadiumsID] INTEGER NULL DEFAULT NULL,
@@ -548,7 +641,7 @@ CREATE TABLE StadiumAttributes (
   PRIMARY KEY ([ID])
 );
 
-		
+
 CREATE TABLE StadiumAttributeTypes (
   [ID] INTEGER NOT NULL IDENTITY,
   [Name] VARCHAR(200) NULL DEFAULT NULL,
@@ -556,7 +649,7 @@ CREATE TABLE StadiumAttributeTypes (
   PRIMARY KEY ([ID])
 );
 
-		
+
 CREATE TABLE Cards (
   [ID] INTEGER NOT NULL IDENTITY,
   [RefereeStatID] INTEGER NULL DEFAULT NULL,
@@ -566,7 +659,7 @@ CREATE TABLE Cards (
   PRIMARY KEY ([ID])
 );
 
-		
+
 CREATE TABLE Referees (
   [ID] INTEGER NOT NULL IDENTITY,
   [Name] VARCHAR(200) NOT NULL,
@@ -608,7 +701,7 @@ ALTER TABLE [CoachTrophies] ADD FOREIGN KEY (TeamId) REFERENCES Teams ([ID]);
 ALTER TABLE [CoachTrophies] ADD FOREIGN KEY (LeagueId) REFERENCES Leagues ([ID]);
 ALTER TABLE [Contracts] ADD FOREIGN KEY (TeamId) REFERENCES Teams ([ID]);
 
-CREATE TABLE MatchItemTypes 
+CREATE TABLE MatchItemTypes
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_MatchItemTypes PRIMARY KEY CLUSTERED,
@@ -617,21 +710,21 @@ CREATE TABLE MatchItemTypes
 
 
 
-CREATE TABLE ActionTypes 
+CREATE TABLE ActionTypes
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_ActionTypes PRIMARY KEY CLUSTERED,
 	Name NVARCHAR(100)
 )
 
-CREATE TABLE ActionItemsType 
+CREATE TABLE ActionItemsType
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_ActionItemsType PRIMARY KEY CLUSTERED,
 	Name NVARCHAR(50)
-) 
+)
 
-CREATE TABLE MatchEventTypes 
+CREATE TABLE MatchEventTypes
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_EventTypes  PRIMARY KEY CLUSTERED,
@@ -640,14 +733,14 @@ CREATE TABLE MatchEventTypes
 )
 
 
-CREATE TABLE MatchItemsAttributesType 
+CREATE TABLE MatchItemsAttributesType
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_MatchItemsAttributesType PRIMARY KEY CLUSTERED,
 	Name VARCHAR(100)
 )
 
-CREATE TABLE RefereeType 
+CREATE TABLE RefereeType
 (
 	ID INT NOT NULL IDENTITY(1,1)
 		CONSTRAINT PK_RefereeType PRIMARY KEY CLUSTERED,
@@ -663,7 +756,7 @@ CREATE TABLE RefereeInMatch
 			CONSTRAINT FK_RefereeInMatch_Referee FOREIGN KEY REFERENCES Referees(ID),
 	MatchID INT
 		CONSTRAINT FK_RefereeInMatch_Matches FOREIGN KEY REFERENCES Matches(ID),
-	RefereeTypeID INT 
+	RefereeTypeID INT
 		CONSTRAINT FK_RefereeInMatch_RefereeType FOREIGN KEY REFERENCES RefereeType(ID)
 )
 
@@ -677,7 +770,7 @@ CREATE TABLE PlayersInMatch
 			CONSTRAINT FK_PlayersInMatch_Positions FOREIGN KEY REFERENCES Positions(ID),
 	IsSubstitute BIT,
 	TimeParticipated TIME NOT NULL,
-	TeamCompositionID INT 
+	TeamCompositionID INT
 		CONSTRAINT FK_PlayersInMatch_TeamComposition FOREIGN KEY REFERENCES TeamComposition(ID),
 	MatchID INT
 		CONSTRAINT FK_PlayersInMatch_Matches FOREIGN KEY REFERENCES Matches(ID)
@@ -715,7 +808,7 @@ CREATE TABLE MatchItemsAttributes
 		CONSTRAINT FK_MathcItemsAtributes_MatchItemsAttributesType FOREIGN KEY REFERENCES MatchItemsAttributesType(ID),
 	Value NVARCHAR(MAX),
 	CONSTRAINT PK_MatchItemId_MatchItemsAttributesTypeID PRIMARY KEY CLUSTERED (MatchItemId, MatchItemsAttributesTypeID)
-		
+
 )
 
 CREATE TABLE MatchEvents
@@ -740,7 +833,7 @@ CREATE TABLE PersonMatchEvents
 	MatchEventID INT
 		CONSTRAINT FK_PersonMatchEvents_MatchEvents	FOREIGN KEY REFERENCES MatchEvents(ID),
 	Time DATETIME,
-	ActionTypeID INT 
+	ActionTypeID INT
 		CONSTRAINT FK_PersonMatchEvents_ActionType FOREIGN KEY REFERENCES ActionTypes(ID),
 	CoachID INT
 			CONSTRAINT FK_PersonMatchEvents_Coaches FOREIGN KEY REFERENCES Coaches(ID),-- Merge part
