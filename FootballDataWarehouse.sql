@@ -1,6 +1,6 @@
 USE master
 DECLARE @DatabaseName nvarchar(50)
-SET @DatabaseName = N'FootbalTeams'
+SET @DatabaseName = N'FootballDataWarehouse'
 
 DECLARE @SQL varchar(max)
 
@@ -11,11 +11,11 @@ WHERE DBId = DB_ID(@DatabaseName) AND SPId <> @@SPId
 
 EXEC(@SQL)
 GO
-DROP DATABASE IF EXISTS  FootbalTeams
+DROP DATABASE IF EXISTS  FootballDataWarehouse
 GO
-CREATE DATABASE FootbalTeams
+CREATE DATABASE FootballDataWarehouse
 GO
-USE FootbalTeams
+USE FootballDataWarehouse
 
 CREATE TABLE EventNames (
     ID INT PRIMARY KEY IDENTITY (1, 1),
